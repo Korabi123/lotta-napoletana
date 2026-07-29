@@ -111,51 +111,111 @@
 /* ─── Custom Cursor ──────────────────────────────────────────────────────── */
 
 .cursor-dot,
-.cursor-ring {
+.cursor-ring,
+.cursor-trail {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 9999;
   will-change: transform;
-  mix-blend-mode: difference;
   border-radius: 50%;
 }
 
+/* Main dot — uses mix-blend-mode difference for universal visibility */
 .cursor-dot {
+  z-index: 9999;
   width: var(--cursor-dot-size, 6px);
   height: var(--cursor-dot-size, 6px);
-  background: var(--cursor-color, var(--cream));
+  background: var(--cream);
+  mix-blend-mode: difference;
   transition:
     width 200ms ease-out,
     height 200ms ease-out,
-    opacity 400ms ease,
-    background-color 250ms ease;
+    opacity 400ms ease;
 }
 
+/* Trail dots — cream with difference blend for visibility */
+.cursor-trail {
+  z-index: 9997;
+  background: var(--cream);
+  mix-blend-mode: difference;
+}
+
+/* Ring — hollow circle with difference blend for universal visibility */
 .cursor-ring {
-  width: var(--cursor-ring-size, 40px);
-  height: var(--cursor-ring-size, 40px);
-  border: 1.5px solid var(--cursor-color, var(--cream));
+  z-index: 9998;
+  width: var(--cursor-ring-size, 56px);
+  height: var(--cursor-ring-size, 56px);
+  border: 1.5px solid var(--cream);
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
+  mix-blend-mode: difference;
   transition:
     width 300ms ease-out,
     height 300ms ease-out,
     opacity 400ms ease,
-    border-color 250ms ease;
+    border-color 250ms ease,
+    background-color 300ms ease,
+    backdrop-filter 300ms ease,
+    box-shadow 300ms ease,
+    mix-blend-mode 0ms;
+}
+
+/* Label state — premium frosted glass with visible pixelated grain texture */
+.cursor-ring--labeled {
+  mix-blend-mode: normal;
+  background:
+    /* Visible pixelated grain texture - coarse and prominent */
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(0, 0, 0, 0.08) 0deg 3deg,
+      transparent 3deg 6deg,
+      rgba(255, 255, 255, 0.12) 6deg 9deg,
+      transparent 9deg 12deg
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.06) 1px,
+      transparent 1px,
+      transparent 2px,
+      rgba(255, 255, 255, 0.08) 2px,
+      rgba(255, 255, 255, 0.03) 3px,
+      transparent 3px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 2px,
+      rgba(255, 255, 255, 0.06) 2px,
+      transparent 3px,
+      transparent 4px
+    ),
+    rgba(255, 255, 255, 0.75);
+  background-size: 8px 8px, 4px 4px, 4px 4px, auto;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+    0 1px 2px rgba(255, 255, 255, 0.8) inset;
 }
 
 .cursor-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--cursor-color, var(--cream));
+  letter-spacing: 0.15em;
+  color: var(--charcoal);
   opacity: 0;
-  transition: opacity 200ms ease, color 250ms ease;
+  transition: opacity 200ms ease;
   white-space: nowrap;
   pointer-events: none;
 }
@@ -167,12 +227,13 @@
 .cursor-dot--hidden,
 .cursor-ring--hidden {
   opacity: 0 !important;
+  transition: opacity 300ms ease !important;
 }
 
 @keyframes cursor-pulse {
-  0% { transform: translate(var(--cursor-tx, 0), var(--cursor-ty, 0)) scale(1); }
-  50% { transform: translate(var(--cursor-tx, 0), var(--cursor-ty, 0)) scale(0.6); }
-  100% { transform: translate(var(--cursor-tx, 0), var(--cursor-ty, 0)) scale(1); }
+  0%   { scale: 1; }
+  50%  { scale: 0.65; }
+  100% { scale: 1; }
 }
 
 .cursor-ring--pulse {
@@ -181,8 +242,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cursor-dot,
+  .cursor-trail,
   .cursor-ring,
   .cursor-label {
-    transition: none;
+    transition: none !important;
+    animation: none !important;
   }
 }
