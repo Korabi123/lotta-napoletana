@@ -43,33 +43,61 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  ::selection { background: var(--terracotta); color: var(--cream); }
+
+  ::selection {
+    background: var(--terracotta);
+    color: var(--cream);
+  }
 }
 
-@utility font-display { font-family: var(--font-display); font-weight: 400; }
-@utility font-mono { font-family: var(--font-mono); }
+@utility font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
 
-@utility text-balance { text-wrap: balance; }
+@utility font-mono {
+  font-family: var(--font-mono);
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
 
 @utility marquee-track {
   animation: marquee 40s linear infinite;
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes ember-flicker {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @utility ember-flicker {

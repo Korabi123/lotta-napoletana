@@ -3,6 +3,8 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { SiteHeader, SiteFooter, WOLT_URL, PHONE, PHONE_DISPLAY } from "@/components/SiteChrome";
 import { MENU } from "@/lib/menu-data";
+import { useLang } from "@/lib/lang-context";
+import { t } from "@/lib/i18n";
 
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -60,6 +62,8 @@ function TagBadge({ label }: { label: string }) {
 
 function MenuPage() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLang();
+  const tr = t(lang).menu;
 
   useIsoLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -91,14 +95,13 @@ function MenuPage() {
       <SiteHeader variant="solid" />
 
       <section className="pt-32 md:pt-40 pb-16 px-6 md:px-10">
-        <div className="menu-meta text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">— The full menu</div>
+        <div className="menu-meta text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.eyebrow}</div>
         <h1 className="menu-hero font-display text-6xl md:text-[10vw] leading-[0.85] mt-4 tracking-tight">
-          <div className="overflow-hidden"><span className="block">Everything on</span></div>
-          <div className="overflow-hidden"><span className="block italic text-terracotta">the table.</span></div>
+          <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block">{tr.heading1}</span></div>
+          <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block italic text-terracotta">{tr.heading2}</span></div>
         </h1>
         <p className="menu-meta mt-6 max-w-xl text-charcoal/70 md:text-lg">
-          Prices are in euro. Dough is proofed 48 hours, sauces are made in-house daily. Please tell us
-          about allergies before you order — the kitchen is small and honest.
+          {tr.desc}
         </p>
         <div className="menu-meta mt-8 flex flex-wrap gap-3">
           <a
@@ -107,13 +110,13 @@ function MenuPage() {
             rel="noreferrer noopener"
             className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-5 py-3 hover:bg-terracotta transition"
           >
-            Order on Wolt →
+            {tr.orderWolt}
           </a>
           <a
             href={`tel:${PHONE}`}
             className="text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-5 py-3 hover:bg-charcoal hover:text-cream transition"
           >
-            Call {PHONE_DISPLAY}
+            {tr.call(PHONE_DISPLAY)}
           </a>
         </div>
       </section>
@@ -123,7 +126,7 @@ function MenuPage() {
           <section key={section.title} className="reveal grid md:grid-cols-12 gap-8">
             <header className="md:col-span-4 md:sticky md:top-32 md:self-start">
               <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">
-                {section.subtitle}
+                {tr.sectionSubtitles[section.subtitle] ?? section.subtitle}
               </div>
               <h2 className="font-display text-5xl md:text-6xl leading-[0.9] mt-3">{section.title}</h2>
             </header>
@@ -133,9 +136,11 @@ function MenuPage() {
                   <div>
                     <div className="flex items-baseline gap-3 flex-wrap">
                       <h3 className="font-display text-2xl md:text-3xl">{item.name}</h3>
-                      {item.tags?.map((t) => <TagBadge key={t} label={t} />)}
+                      {item.tags?.map((tag) => <TagBadge key={tag} label={tag} />)}
                     </div>
-                    <p className="mt-2 text-charcoal/70 max-w-xl">{item.desc}</p>
+                    <p className="mt-2 text-charcoal/70 max-w-xl">
+                      {lang === "sq" ? item.descSq : item.desc}
+                    </p>
                   </div>
                   <div className="font-display text-2xl md:text-3xl text-terracotta tabular-nums">{item.price}</div>
                 </article>

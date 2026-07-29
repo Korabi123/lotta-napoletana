@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLenis } from "lenis/react";
 import gsap from "gsap";
 import heroPizza from "@/assets/hero-pizza.jpg";
 import oven from "@/assets/oven.jpg";
@@ -16,6 +17,8 @@ import {
   PHONE_DISPLAY,
   WOLT_URL,
 } from "@/components/SiteChrome";
+import { useLang } from "@/lib/lang-context";
+import { t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -84,6 +87,8 @@ function Preloader({ onDone }: { onDone: () => void }) {
   const barRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLang();
+  const tr = t(lang).preloader;
 
   useIsoLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -135,15 +140,15 @@ function Preloader({ onDone }: { onDone: () => void }) {
         <span className="font-mono">Est. Prishtinë</span>
       </div>
       <div ref={titleRef} className="font-display leading-[0.85] text-[18vw] md:text-[14vw] tracking-tight">
-        <div className="overflow-hidden"><span className="block">Lotta</span></div>
-        <div className="overflow-hidden text-right italic text-terracotta"><span className="block">Napoletana.</span></div>
+        <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block">Lotta</span></div>
+        <div className="overflow-hidden py-[0.15em] -my-[0.15em] text-right italic text-terracotta"><span className="block">Napoletana.</span></div>
       </div>
       <div className="flex items-end justify-between gap-6">
         <div className="flex-1">
           <div className="h-px w-full bg-cream/20 overflow-hidden">
             <div ref={barRef} className="h-px w-full bg-cream origin-left" style={{ transform: "scaleX(0)" }} />
           </div>
-          <div className="mt-3 text-[11px] uppercase tracking-[0.3em] font-mono opacity-70">Stoking the oven</div>
+          <div className="mt-3 text-[11px] uppercase tracking-[0.3em] font-mono opacity-70">{tr.tagline}</div>
         </div>
         <div ref={countRef} className="font-display text-5xl md:text-7xl tabular-nums">000</div>
       </div>
@@ -155,14 +160,39 @@ function Index() {
   const [loading, setLoading] = useState(true);
   const heroImgRef = useRef<HTMLImageElement>(null);
   const sectionsRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLang();
+  const tr = t(lang);
+
+  // Parallax via Lenis (runs every smooth-scroll frame, no stutter)
+  useLenis(({ scroll }) => {
+    const parallaxEls = sectionsRef.current?.querySelectorAll<HTMLElement>(".parallax");
+    if (!parallaxEls) return;
+    parallaxEls.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const center = window.innerHeight / 2;
+      const delta = (rect.top + rect.height / 2 - center) / window.innerHeight;
+      gsap.set(el, { y: delta * -40 });
+    });
+  });
 
   useIsoLayoutEffect(() => {
     if (loading) return;
+    const sections = sectionsRef.current;
+    if (!sections) return;
+
     const ctx = gsap.context(() => {
+      // Make visible, then animate hero in
+      gsap.set(sections, { visibility: "visible" });
+
+      // Set starting positions first, then animate in
+      gsap.set(".hero-line span", { yPercent: 110 });
+      gsap.set(".hero-meta", { opacity: 0, y: 20 });
+      gsap.set(heroImgRef.current, { scale: 1.15, opacity: 0 });
+
       const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
-      tl.from(".hero-line span", { yPercent: 110, stagger: 0.08, duration: 1.1 }, 0.1)
-        .from(".hero-meta", { opacity: 0, y: 20, stagger: 0.1, duration: 0.8 }, 0.4)
-        .from(heroImgRef.current, { scale: 1.15, opacity: 0, duration: 1.6, ease: "expo.out" }, 0.1);
+      tl.to(".hero-line span", { yPercent: 0, stagger: 0.08, duration: 1.1 }, 0.1)
+        .to(".hero-meta", { opacity: 1, y: 0, stagger: 0.1, duration: 0.8 }, 0.4)
+        .to(heroImgRef.current, { scale: 1, opacity: 1, duration: 1.6, ease: "expo.out" }, 0.1);
 
       const revealEls = gsap.utils.toArray<HTMLElement>(".reveal");
       revealEls.forEach((el) => {
@@ -180,33 +210,18 @@ function Index() {
         );
         io.observe(el);
       });
-
-      const parallaxEls = gsap.utils.toArray<HTMLElement>(".parallax");
-      let ticking = false;
-      const onScroll = () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          parallaxEls.forEach((el) => {
-            const rect = el.getBoundingClientRect();
-            const center = window.innerHeight / 2;
-            const delta = (rect.top + rect.height / 2 - center) / window.innerHeight;
-            gsap.to(el, { y: delta * -40, duration: 0.6, ease: "power2.out", overwrite: true });
-          });
-          ticking = false;
-        });
-      };
-      window.addEventListener("scroll", onScroll, { passive: true });
-      onScroll();
-      return () => window.removeEventListener("scroll", onScroll);
-    }, sectionsRef);
+    }, sections);
     return () => ctx.revert();
   }, [loading]);
 
   return (
     <>
       {loading && <Preloader onDone={() => setLoading(false)} />}
-      <div ref={sectionsRef} className="min-h-screen bg-cream text-charcoal overflow-x-hidden">
+      <div
+        ref={sectionsRef}
+        className="min-h-screen bg-cream text-charcoal"
+        style={{ visibility: loading ? "hidden" : undefined }}
+      >
         <SiteHeader variant="overlay" />
 
         {/* HERO */}
@@ -214,28 +229,28 @@ function Index() {
           <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">
             <span className="hero-meta">{ADDRESS}</span>
             <span className="hero-meta flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-basil ember-flicker" /> Open · Closes 11 PM
+              <span className="w-1.5 h-1.5 rounded-full bg-basil ember-flicker" /> {tr.home.heroOpen}
             </span>
           </div>
 
           <div className="grid md:grid-cols-12 gap-6 md:gap-10 items-end mt-10">
             <div className="md:col-span-7 order-2 md:order-1">
               <h1 className="hero-line font-display leading-[0.85] text-[20vw] md:text-[12vw] tracking-tight">
-                <div className="overflow-hidden"><span className="block">Napoli</span></div>
-                <div className="overflow-hidden"><span className="block italic text-terracotta">a Prishtinë.</span></div>
+                <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block">Napoli</span></div>
+                <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block italic text-terracotta">a Prishtinë.</span></div>
               </h1>
               <div className="mt-8 grid grid-cols-3 gap-6 max-w-lg">
                 <div className="hero-meta">
                   <div className="font-display text-4xl">5.0</div>
-                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">1,318 reviews</div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">{tr.home.heroReviews}</div>
                 </div>
                 <div className="hero-meta">
                   <div className="font-display text-4xl">€5–10</div>
-                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">Per person</div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">{tr.home.heroPriceLabel}</div>
                 </div>
                 <div className="hero-meta">
                   <div className="font-display text-4xl">450°</div>
-                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">Wood-fired</div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] font-mono text-charcoal/60 mt-1">{tr.home.heroFireLabel}</div>
                 </div>
               </div>
               <div className="hero-meta mt-10 flex flex-wrap gap-3">
@@ -245,13 +260,13 @@ function Index() {
                   rel="noreferrer noopener"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-5 py-3 hover:bg-terracotta transition"
                 >
-                  Order on Wolt →
+                  {tr.home.orderWolt}
                 </a>
                 <Link
                   to="/menu"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-5 py-3 hover:bg-charcoal hover:text-cream transition"
                 >
-                  See the menu
+                  {tr.home.seeMenu}
                 </Link>
               </div>
             </div>
@@ -269,7 +284,7 @@ function Index() {
               />
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-cream text-[10px] font-mono uppercase tracking-[0.25em]">
                 <span>Nº 01 — Marinara</span>
-                <span>90s in the oven</span>
+                <span>{tr.home.heroImageCaption}</span>
               </div>
             </div>
           </div>
@@ -295,21 +310,17 @@ function Index() {
         {/* STORY */}
         <section id="story" className="px-6 md:px-10 py-24 md:py-40 grid md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-4 md:sticky md:top-32">
-            <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">— Chapter I</div>
+            <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.home.story.eyebrow}</div>
             <h2 className="reveal font-display text-6xl md:text-7xl leading-[0.9] mt-4">
-              The dough <span className="italic text-terracotta">rests</span>, the fire waits.
+              {tr.home.story.heading1}<span className="italic text-terracotta">{tr.home.story.headingEm}</span>{tr.home.story.heading2}
             </h2>
           </div>
           <div className="md:col-span-5 md:col-start-8 space-y-8">
             <p className="reveal text-lg md:text-xl leading-relaxed text-balance">
-              Everything begins with flour, water, salt, and patience. Our dough proofs for forty-eight
-              hours before it meets the oven, where oak and beech push the stones past four hundred
-              degrees. Ninety seconds later, a pizza comes out the only way Napoli would recognize it.
+              {tr.home.story.p1}
             </p>
             <p className="reveal text-charcoal/70 leading-relaxed">
-              Mehmet, the owner, still walks table to table asking how it tastes — because the answer
-              matters. It's why 1,318 people have left five stars, and why the guest book is heavier
-              every week.
+              {tr.home.story.p2}
             </p>
             <div className="reveal aspect-[4/3] overflow-hidden rounded-sm">
               <img
@@ -329,23 +340,23 @@ function Index() {
         <section id="menu-preview" className="px-6 md:px-10 py-24 md:py-32 bg-charcoal text-cream">
           <div className="flex items-end justify-between mb-16 md:mb-24">
             <div>
-              <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">— Highlights</div>
-              <h2 className="reveal font-display text-6xl md:text-8xl leading-[0.9] mt-4">A short list.</h2>
+              <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">{tr.home.highlights.eyebrow}</div>
+              <h2 className="reveal font-display text-6xl md:text-8xl leading-[0.9] mt-4">{tr.home.highlights.heading}</h2>
             </div>
             <Link
               to="/menu"
               className="reveal hidden md:inline-flex text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
             >
-              See the full menu →
+              {tr.home.highlights.seeAll}
             </Link>
           </div>
 
           <div className="space-y-16 md:space-y-24">
             {[
-              { n: "01", name: "Pizza Marinara", desc: "San Marzano, garlic, oregano, olio. The old way — no cheese, all soul.", price: "€6", img: heroPizza, alt: "Pizza marinara" },
-              { n: "02", name: "Pizza Margherita", desc: "Fior di latte, basil, extra virgin olive oil. The reason Napoli exists.", price: "€7", img: margherita, alt: "Pizza margherita" },
-              { n: "03", name: "Sallatë Burrata", desc: "Whole burrata, heirloom tomato, basil, cold-pressed oil, black pepper.", price: "€9", img: burrata, alt: "Burrata salad with heirloom tomato" },
-              { n: "04", name: "Cortado", desc: "Double espresso, a whisper of steamed milk. To end things properly.", price: "€2", img: cortado, alt: "Cortado coffee" },
+              { n: "01", name: "Pizza Marinara", price: "€6", img: heroPizza, alt: "Pizza marinara" },
+              { n: "02", name: "Pizza Margherita", price: "€7", img: margherita, alt: "Pizza margherita" },
+              { n: "03", name: "Sallatë Burrata", price: "€9", img: burrata, alt: "Burrata salad with heirloom tomato" },
+              { n: "04", name: "Cortado", price: "€2", img: cortado, alt: "Cortado coffee" },
             ].map((item, i) => (
               <div key={item.n} className="reveal grid md:grid-cols-12 gap-6 md:gap-10 items-center group border-t border-cream/15 pt-10">
                 <div className={`md:col-span-2 font-mono text-sm text-cream/50 ${i % 2 ? "md:order-3" : ""}`}>Nº {item.n}</div>
@@ -363,7 +374,7 @@ function Index() {
                     <h3 className="font-display text-4xl md:text-6xl">{item.name}</h3>
                     <span className="font-display text-3xl md:text-4xl text-terracotta">{item.price}</span>
                   </div>
-                  <p className="mt-4 text-cream/70 md:text-lg max-w-md">{item.desc}</p>
+                  <p className="mt-4 text-cream/70 md:text-lg max-w-md">{tr.home.highlights.dishes[i].desc}</p>
                 </div>
               </div>
             ))}
@@ -374,16 +385,16 @@ function Index() {
               to="/menu"
               className="inline-flex text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3"
             >
-              See the full menu →
+              {tr.home.highlights.seeAll}
             </Link>
           </div>
         </section>
 
         {/* VOICES */}
         <section id="voices" className="px-6 md:px-10 py-24 md:py-40">
-          <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">— Voices</div>
+          <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.home.voices.eyebrow}</div>
           <h2 className="reveal font-display text-6xl md:text-8xl leading-[0.9] mt-4 max-w-4xl">
-            Five stars, <span className="italic text-terracotta">one thousand</span> three hundred and eighteen times.
+            {tr.home.voices.heading1}<span className="italic text-terracotta">{tr.home.voices.headingEm}</span>{tr.home.voices.heading2}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6 mt-16">
@@ -425,21 +436,20 @@ function Index() {
           </div>
           <div className="relative px-6 md:px-10 py-24 md:py-40 text-cream grid md:grid-cols-12 gap-8">
             <div className="md:col-span-6">
-              <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">— Visit</div>
+              <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">{tr.home.visit.eyebrow}</div>
               <h2 className="reveal font-display text-6xl md:text-8xl leading-[0.9] mt-4">
-                Come <span className="italic text-terracotta">hungry.</span>
+                {tr.home.visit.heading1}<span className="italic text-terracotta">{tr.home.visit.headingEm}</span>
               </h2>
               <p className="reveal mt-6 text-cream/80 max-w-md md:text-lg">
-                Outdoor seating, quiet enough to talk, kid-friendly, vegan options, and Kosovan house
-                wine that pairs better than it has any right to.
+                {tr.home.visit.desc}
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8 space-y-8">
               {[
-                { l: "Address", v: ADDRESS },
-                { l: "Hours", v: "Open daily · Closes 11 PM" },
-                { l: "Phone", v: PHONE_DISPLAY },
-                { l: "Delivery", v: "wolt.com" },
+                { l: tr.home.visit.labelAddress, v: ADDRESS },
+                { l: tr.home.visit.labelHours, v: tr.home.visit.hoursValue },
+                { l: tr.home.visit.labelPhone, v: PHONE_DISPLAY },
+                { l: tr.home.visit.labelDelivery, v: "wolt.com" },
               ].map((row) => (
                 <div key={row.l} className="reveal border-t border-cream/20 pt-4 flex items-baseline justify-between gap-4">
                   <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">{row.l}</div>
@@ -453,7 +463,7 @@ function Index() {
                   rel="noreferrer noopener"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
                 >
-                  Get directions →
+                  {tr.home.visit.getDirections}
                 </a>
                 <a
                   href={WOLT_URL}
@@ -461,13 +471,13 @@ function Index() {
                   rel="noreferrer noopener"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono bg-terracotta text-cream rounded-full px-5 py-3 hover:bg-ember transition"
                 >
-                  Order on Wolt →
+                  {tr.home.visit.orderWolt}
                 </a>
                 <Link
                   to="/contact"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
                 >
-                  Reserve →
+                  {tr.home.visit.reserve}
                 </Link>
               </div>
             </div>

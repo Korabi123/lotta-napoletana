@@ -12,6 +12,8 @@ import {
   PHONE_DISPLAY,
   WOLT_URL,
 } from "@/components/SiteChrome";
+import { useLang } from "@/lib/lang-context";
+import { t } from "@/lib/i18n";
 
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -53,6 +55,8 @@ function ContactPage() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<FormState>({ status: "idle" });
   const [submitting, setSubmitting] = useState(false);
+  const { lang } = useLang();
+  const tr = t(lang).contact;
 
   useIsoLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -106,10 +110,10 @@ function ContactPage() {
       <SiteHeader variant="solid" />
 
       <section className="pt-32 md:pt-40 pb-16 px-6 md:px-10">
-        <div className="c-fade text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">— Say ciao</div>
+        <div className="c-fade text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.eyebrow}</div>
         <h1 className="c-hero font-display text-6xl md:text-[10vw] leading-[0.85] mt-4 tracking-tight">
-          <div className="overflow-hidden"><span className="block">Reserve, ask,</span></div>
-          <div className="overflow-hidden"><span className="block italic text-terracotta">or say hello.</span></div>
+          <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block">{tr.heading1}</span></div>
+          <div className="overflow-hidden py-[0.15em] -my-[0.15em]"><span className="block italic text-terracotta">{tr.heading2}</span></div>
         </h1>
       </section>
 
@@ -117,15 +121,15 @@ function ContactPage() {
         {/* CONTACT INFO */}
         <aside className="md:col-span-4 space-y-8">
           <div className="c-fade">
-            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">The fastest way</div>
+            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.fastestWay}</div>
             <a href={`tel:${PHONE}`} className="mt-2 block font-display text-3xl md:text-4xl hover:text-terracotta transition">
               {PHONE_DISPLAY}
             </a>
-            <div className="text-sm text-charcoal/60 mt-1">Open daily · closes 11 PM</div>
+            <div className="text-sm text-charcoal/60 mt-1">{tr.openHours}</div>
           </div>
 
           <div className="c-fade">
-            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">Order online</div>
+            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.orderOnline}</div>
             <a
               href={WOLT_URL}
               target="_blank"
@@ -137,14 +141,14 @@ function ContactPage() {
           </div>
 
           <div className="c-fade">
-            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">Email</div>
+            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.emailLabel}</div>
             <a href={`mailto:${EMAIL}`} className="mt-2 block font-display text-2xl md:text-3xl hover:text-terracotta transition break-words">
               {EMAIL}
             </a>
           </div>
 
           <div className="c-fade">
-            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">Find us</div>
+            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.findUs}</div>
             <address className="mt-2 not-italic font-display text-2xl md:text-3xl leading-tight">
               {ADDRESS}
             </address>
@@ -154,7 +158,7 @@ function ContactPage() {
               rel="noreferrer noopener"
               className="mt-3 inline-block text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-4 py-2 hover:bg-charcoal hover:text-cream transition"
             >
-              Google Maps →
+              {tr.googleMaps}
             </a>
           </div>
         </aside>
@@ -163,9 +167,9 @@ function ContactPage() {
         <div className="md:col-span-7 md:col-start-6 c-fade">
           {state.status === "success" ? (
             <div className="border border-basil/40 bg-basil/10 p-8 rounded-sm">
-              <div className="font-display text-3xl">Grazie — your email client is opening.</div>
+              <div className="font-display text-3xl">{tr.successTitle}</div>
               <p className="mt-2 text-charcoal/70">
-                If nothing happened, write us directly at{" "}
+                {tr.successBody}{" "}
                 <a href={`mailto:${EMAIL}`} className="underline decoration-terracotta">
                   {EMAIL}
                 </a>
@@ -175,7 +179,7 @@ function ContactPage() {
           ) : (
             <form onSubmit={onSubmit} noValidate className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
-                <Field label="Name" error={errors.name}>
+                <Field label={tr.fieldName} error={errors.name}>
                   <input
                     type="text"
                     name="name"
@@ -185,7 +189,7 @@ function ContactPage() {
                     className="w-full bg-transparent border-b border-charcoal/30 focus:border-charcoal outline-none py-2 text-lg"
                   />
                 </Field>
-                <Field label="Email" error={errors.email}>
+                <Field label={tr.fieldEmail} error={errors.email}>
                   <input
                     type="email"
                     name="email"
@@ -197,22 +201,22 @@ function ContactPage() {
                 </Field>
               </div>
 
-              <Field label="What can we help with?" error={errors.topic}>
+              <Field label={tr.fieldTopic} error={errors.topic}>
                 <select
                   name="topic"
                   required
                   defaultValue="reservation"
                   className="w-full bg-transparent border-b border-charcoal/30 focus:border-charcoal outline-none py-2 text-lg"
                 >
-                  <option value="reservation">Table reservation</option>
-                  <option value="private-event">Private event / buyout</option>
-                  <option value="press">Press & collaboration</option>
-                  <option value="other">Something else</option>
+                  <option value="reservation">{tr.topicReservation}</option>
+                  <option value="private-event">{tr.topicPrivate}</option>
+                  <option value="press">{tr.topicPress}</option>
+                  <option value="other">{tr.topicOther}</option>
                 </select>
               </Field>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <Field label="Party size (optional)" error={errors.people}>
+                <Field label={tr.fieldPartySize} error={errors.people}>
                   <input
                     type="number"
                     name="people"
@@ -221,7 +225,7 @@ function ContactPage() {
                     className="w-full bg-transparent border-b border-charcoal/30 focus:border-charcoal outline-none py-2 text-lg"
                   />
                 </Field>
-                <Field label="Preferred date & time (optional)" error={errors.date}>
+                <Field label={tr.fieldDate} error={errors.date}>
                   <input
                     type="text"
                     name="date"
@@ -232,7 +236,7 @@ function ContactPage() {
                 </Field>
               </div>
 
-              <Field label="Message" error={errors.message}>
+              <Field label={tr.fieldMessage} error={errors.message}>
                 <textarea
                   name="message"
                   required
@@ -248,10 +252,10 @@ function ContactPage() {
                 disabled={submitting}
                 className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-6 py-4 hover:bg-terracotta transition disabled:opacity-50"
               >
-                {submitting ? "Sending…" : "Send inquiry →"}
+                {submitting ? tr.submitting : tr.submit}
               </button>
               <p className="text-xs text-charcoal/50">
-                Submitting opens your email app pre-filled — we reply within one working day.
+                {tr.submitNote}
               </p>
             </form>
           )}
