@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-export const WOLT_URL = "https://wolt.com/en/discovery/venue/lotta-napoletana";
+export const WOLT_URL = "https://wolt.com/sq/xkx/pristina/restaurant/lottas-pizzabar-napoletana";
 export const GLOVO_URL = "https://glovoapp.com/";
 export const MAPS_URL = "https://maps.app.goo.gl/xaaRoytszneFUEZt6";
 export const PHONE = "+38344255064";
