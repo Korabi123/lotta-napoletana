@@ -1,0 +1,77 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cream: var(--cream);
+  --color-charcoal: var(--charcoal);
+  --color-terracotta: var(--terracotta);
+  --color-basil: var(--basil);
+  --color-ember: var(--ember);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.96 0.012 85);
+  --foreground: oklch(0.18 0.01 60);
+  --cream: oklch(0.96 0.012 85);
+  --charcoal: oklch(0.15 0.008 60);
+  --terracotta: oklch(0.58 0.14 40);
+  --basil: oklch(0.42 0.09 145);
+  --ember: oklch(0.68 0.18 45);
+  --muted: oklch(0.92 0.012 80);
+  --muted-foreground: oklch(0.42 0.02 60);
+  --border: oklch(0.85 0.02 70);
+  --primary: oklch(0.15 0.008 60);
+  --primary-foreground: oklch(0.96 0.012 85);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--terracotta); color: var(--cream); }
+}
+
+@utility font-display { font-family: var(--font-display); font-weight: 400; }
+@utility font-mono { font-family: var(--font-mono); }
+
+@utility text-balance { text-wrap: balance; }
+
+@utility marquee-track {
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes ember-flicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@utility ember-flicker {
+  animation: ember-flicker 2.4s ease-in-out infinite;
+}
