@@ -108,12 +108,14 @@ function MenuPage() {
             href={WOLT_URL}
             target="_blank"
             rel="noreferrer noopener"
+            data-cursor-label="Order"
             className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-5 py-3 hover:bg-terracotta transition"
           >
             {tr.orderWolt}
           </a>
           <a
             href={`tel:${PHONE}`}
+            data-cursor-label="Call"
             className="text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-5 py-3 hover:bg-charcoal hover:text-cream transition"
           >
             {tr.call(PHONE_DISPLAY)}
@@ -132,7 +134,7 @@ function MenuPage() {
             </header>
             <div className="md:col-span-8 divide-y divide-charcoal/15">
               {section.items.map((item, i) => (
-                <article key={`${section.title}-${i}`} className="py-6 first:pt-0 grid grid-cols-[1fr_auto] gap-6 items-baseline">
+                <article key={`${section.title}-${i}`} data-cursor className="py-6 first:pt-0 grid grid-cols-[1fr_auto] gap-6 items-baseline">
                   <div>
                     <div className="flex items-baseline gap-3 flex-wrap">
                       <h3 className="font-display text-2xl md:text-3xl">{item.name}</h3>

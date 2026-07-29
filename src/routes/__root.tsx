@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { ReactLenis } from "lenis/react";
 import { LangProvider } from "../lib/lang-context";
+import { CursorProvider } from "@/components/cursor";
 
 import appCss from "../styles.css?url";
 import lenisCss from "lenis/dist/lenis.css?url";
@@ -120,13 +121,15 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <LangProvider>
-      <QueryClientProvider client={queryClient}>
-        <ReactLenis root options={{ lerp: 0.1, duration: 1.2, smoothWheel: true }}>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </ReactLenis>
-      </QueryClientProvider>
-    </LangProvider>
+    <CursorProvider>
+      <LangProvider>
+        <QueryClientProvider client={queryClient}>
+          <ReactLenis root options={{ lerp: 0.1, duration: 1.2, smoothWheel: true }}>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </ReactLenis>
+        </QueryClientProvider>
+      </LangProvider>
+    </CursorProvider>
   );
 }

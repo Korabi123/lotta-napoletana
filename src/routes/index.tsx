@@ -258,12 +258,14 @@ function Index() {
                   href={WOLT_URL}
                   target="_blank"
                   rel="noreferrer noopener"
+                  data-cursor-label="Order"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-5 py-3 hover:bg-terracotta transition"
                 >
                   {tr.home.orderWolt}
                 </a>
                 <Link
                   to="/menu"
+                  data-cursor-label="Menu"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-5 py-3 hover:bg-charcoal hover:text-cream transition"
                 >
                   {tr.home.seeMenu}
@@ -271,7 +273,7 @@ function Index() {
               </div>
             </div>
 
-            <div className="md:col-span-5 order-1 md:order-2 relative aspect-[4/5] overflow-hidden rounded-sm">
+            <div className="md:col-span-5 order-1 md:order-2 relative aspect-[4/5] overflow-hidden rounded-sm" data-cursor-label="View">
               <img
                 ref={heroImgRef}
                 src={heroPizza}
@@ -337,7 +339,7 @@ function Index() {
         </section>
 
         {/* MENU PREVIEW */}
-        <section id="menu-preview" className="px-6 md:px-10 py-24 md:py-32 bg-charcoal text-cream">
+        <section id="menu-preview" className="px-6 md:px-10 py-24 md:py-32 bg-charcoal text-cream" data-cursor-color="terracotta">
           <div className="flex items-end justify-between mb-16 md:mb-24">
             <div>
               <div className="reveal text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">{tr.home.highlights.eyebrow}</div>
@@ -358,7 +360,7 @@ function Index() {
               { n: "03", name: "Sallatë Burrata", price: "€9", img: burrata, alt: "Burrata salad with heirloom tomato" },
               { n: "04", name: "Cortado", price: "€2", img: cortado, alt: "Cortado coffee" },
             ].map((item, i) => (
-              <div key={item.n} className="reveal grid md:grid-cols-12 gap-6 md:gap-10 items-center group border-t border-cream/15 pt-10">
+              <div key={item.n} className="reveal grid md:grid-cols-12 gap-6 md:gap-10 items-center group border-t border-cream/15 pt-10" data-cursor>
                 <div className={`md:col-span-2 font-mono text-sm text-cream/50 ${i % 2 ? "md:order-3" : ""}`}>Nº {item.n}</div>
                 <div className={`md:col-span-4 aspect-[4/5] overflow-hidden rounded-sm ${i % 2 ? "md:order-1" : "md:order-2"}`}>
                   <img
@@ -461,6 +463,7 @@ function Index() {
                   href={MAPS_URL}
                   target="_blank"
                   rel="noreferrer noopener"
+                  data-cursor-label="Maps"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
                 >
                   {tr.home.visit.getDirections}
@@ -469,12 +472,14 @@ function Index() {
                   href={WOLT_URL}
                   target="_blank"
                   rel="noreferrer noopener"
+                  data-cursor-label="Order"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono bg-terracotta text-cream rounded-full px-5 py-3 hover:bg-ember transition"
                 >
                   {tr.home.visit.orderWolt}
                 </a>
                 <Link
                   to="/contact"
+                  data-cursor-label="Reserve"
                   className="text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
                 >
                   {tr.home.visit.reserve}

@@ -122,7 +122,7 @@ function ContactPage() {
         <aside className="md:col-span-4 space-y-8">
           <div className="c-fade">
             <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-charcoal/60">{tr.fastestWay}</div>
-            <a href={`tel:${PHONE}`} className="mt-2 block font-display text-3xl md:text-4xl hover:text-terracotta transition">
+            <a href={`tel:${PHONE}`} data-cursor-label="Call" className="mt-2 block font-display text-3xl md:text-4xl hover:text-terracotta transition">
               {PHONE_DISPLAY}
             </a>
             <div className="text-sm text-charcoal/60 mt-1">{tr.openHours}</div>
@@ -134,6 +134,7 @@ function ContactPage() {
               href={WOLT_URL}
               target="_blank"
               rel="noreferrer noopener"
+              data-cursor-label="Order"
               className="mt-2 block font-display text-2xl md:text-3xl hover:text-terracotta transition"
             >
               wolt.com →
@@ -156,6 +157,7 @@ function ContactPage() {
               href={MAPS_URL}
               target="_blank"
               rel="noreferrer noopener"
+              data-cursor-label="Directions"
               className="mt-3 inline-block text-[11px] uppercase tracking-[0.25em] font-mono border border-charcoal rounded-full px-4 py-2 hover:bg-charcoal hover:text-cream transition"
             >
               {tr.googleMaps}
@@ -250,6 +252,7 @@ function ContactPage() {
               <button
                 type="submit"
                 disabled={submitting}
+                data-cursor-label="Send"
                 className="text-[11px] uppercase tracking-[0.25em] font-mono bg-charcoal text-cream rounded-full px-6 py-4 hover:bg-terracotta transition disabled:opacity-50"
               >
                 {submitting ? tr.submitting : tr.submit}
