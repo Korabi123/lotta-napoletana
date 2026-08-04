@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import gsap from "gsap";
-import heroPizza from "@/assets/hero-pizza.jpg";
-import oven from "@/assets/oven.jpg";
-import burrata from "@/assets/burrata.jpg";
-import margherita from "@/assets/margherita.jpg";
-import cortado from "@/assets/cortado.jpg";
-import interior from "@/assets/interior.jpg";
+import heroPizza from "@/assets/ai/hero-pizza.jpg";
+import homemadePizza from "@/assets/real/lotta-homemade-pizza.png"
+import oven from "@/assets/ai/oven.jpg";
+import burrata from "@/assets/ai/burrata.jpg";
+import margherita from "@/assets/real/pizza-margherita.png";
+import cortado from "@/assets/ai/cortado.jpg";
+import interior from "@/assets/ai/interior.jpg";
+import pizzaChief from "@/assets/real/pizza-chef.png";
 import {
   SiteHeader,
   SiteFooter,
@@ -160,10 +162,42 @@ function Preloader({ onDone }: { onDone: () => void }) {
 
 function Index() {
   const [loading, setLoading] = useState(true);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string; title: string } | null>(null);
   const heroImgRef = useRef<HTMLImageElement>(null);
   const sectionsRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const { lang } = useLang();
   const tr = t(lang);
+
+  // Open image modal
+  const openImageModal = (src: string, alt: string, title: string) => {
+    setSelectedImage({ src, alt, title });
+    setImageModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  // Close image modal with animation
+  const closeImageModal = () => {
+    const modal = modalRef.current;
+    if (modal) {
+      modal.style.animation = 'fadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+      setTimeout(() => {
+        setImageModalOpen(false);
+        document.body.style.overflow = '';
+        setSelectedImage(null);
+      }, 300);
+    }
+  };
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && imageModalOpen) closeImageModal();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [imageModalOpen]);
 
   // Parallax via Lenis (runs every smooth-scroll frame, no stutter)
   useLenis(({ scroll }) => {
@@ -275,11 +309,11 @@ function Index() {
               </div>
             </div>
 
-            <div className="md:col-span-5 order-1 md:order-2 relative aspect-[4/5] overflow-hidden rounded-sm" data-cursor-label="View">
+            <div className="md:col-span-5 order-1 md:order-2 relative aspect-[4/5] overflow-hidden rounded-sm">
               <img
                 ref={heroImgRef}
                 src={heroPizza}
-                alt="Wood-fired Neapolitan pizza with basil at Lotta Napoletana"
+                alt="Lotta's homemade pizza at Lotta Napoletana"
                 width={1600}
                 height={1808}
                 fetchPriority="high"
@@ -287,7 +321,7 @@ function Index() {
                 className="w-full h-full object-cover"
               />
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-cream text-[10px] font-mono uppercase tracking-[0.25em]">
-                <span>Nº 01 — Marinara</span>
+                <span>Nº 01 — Lotta's</span>
                 <span>{tr.home.heroImageCaption}</span>
               </div>
             </div>
@@ -350,6 +384,7 @@ function Index() {
             <Link
               to="/menu"
               className="reveal hidden md:inline-flex text-[11px] uppercase tracking-[0.25em] font-mono border border-cream rounded-full px-5 py-3 hover:bg-cream hover:text-charcoal transition"
+              data-cursor-label="Menu"
             >
               {tr.home.highlights.seeAll}
             </Link>
@@ -357,22 +392,25 @@ function Index() {
 
           <div className="space-y-16 md:space-y-24">
             {[
-              { n: "01", name: "Pizza Marinara", price: "€6", img: heroPizza, alt: "Pizza marinara" },
-              { n: "02", name: "Pizza Margherita", price: "€7", img: margherita, alt: "Pizza margherita" },
-              { n: "03", name: "Sallatë Burrata", price: "€9", img: burrata, alt: "Burrata salad with heirloom tomato" },
-              { n: "04", name: "Cortado", price: "€2", img: cortado, alt: "Cortado coffee" },
+              { n: "01", name: "Lotta's (Homemade Pizza)", price: "€7.80", img: homemadePizza, alt: "Lotta's signature pizza with dried meat and sujuk" },
+              { n: "02", name: "Pizza Margherita", price: "€5.50", img: margherita, alt: "Classic Pizza Margherita" },
+              { n: "03", name: "Pizza Chef", price: "€7.50", img: pizzaChief, alt: "Pizza Chief with spinach and ground beef" },
             ].map((item, i) => (
-              <div key={item.n} className="reveal grid md:grid-cols-12 gap-6 md:gap-10 items-center group border-t border-cream/15 pt-10" data-cursor>
+              <div key={item.n} className="reveal grid md:grid-cols-12 gap-6 md:gap-10 items-center group border-t border-cream/15 pt-10">
                 <div className={`md:col-span-2 font-mono text-sm text-cream/50 ${i % 2 ? "md:order-3" : ""}`}>Nº {item.n}</div>
-                <div className={`md:col-span-4 aspect-[4/5] overflow-hidden rounded-sm ${i % 2 ? "md:order-1" : "md:order-2"}`}>
+                <button
+                  onClick={() => openImageModal(item.img, item.alt, item.name)}
+                  className={`md:col-span-4 aspect-[4/5] overflow-hidden rounded-sm bg-charcoal/50 ${i % 2 ? "md:order-1" : "md:order-2"} cursor-pointer`}
+                  data-cursor-label="View"
+                >
                   <img
                     src={item.img}
                     alt={item.alt}
                     loading="lazy"
                     decoding="async"
-                    className="parallax w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-1000"
                   />
-                </div>
+                </button>
                 <div className={`md:col-span-6 ${i % 2 ? "md:order-2" : "md:order-3"}`}>
                   <div className="flex items-baseline justify-between gap-6">
                     <h3 className="font-display text-4xl md:text-6xl">{item.name}</h3>
@@ -493,6 +531,107 @@ function Index() {
 
         <SiteFooter />
       </div>
+
+      {/* IMAGE MODAL - Awwwards Style */}
+      {imageModalOpen && selectedImage && (
+        <div
+          ref={modalRef}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-6 md:p-20"
+          style={{
+            background: 'rgba(38, 35, 33, 0.97)',
+            backdropFilter: 'blur(20px)',
+            animation: 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          onClick={closeImageModal}
+        >
+          {/* Close button */}
+          <button
+            onClick={closeImageModal}
+            className="fixed top-6 right-6 md:top-10 md:right-10 z-10 text-cream hover:text-terracotta transition-colors duration-300 group"
+            data-cursor-label="Close"
+            aria-label="Close modal"
+          >
+            <div className="flex items-center gap-3">
+              <span className="hidden md:inline text-[11px] uppercase tracking-[0.3em] font-mono opacity-70 group-hover:opacity-100 transition-opacity">
+                Close
+              </span>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="transition-transform duration-300 group-hover:rotate-90"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </div>
+          </button>
+
+          {/* Image title - moved to bottom */}
+          <div className="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-10">
+            <div className="text-[11px] uppercase tracking-[0.3em] font-mono text-cream/60">
+              Preview
+            </div>
+            <h3 className="font-display text-2xl md:text-4xl text-cream mt-2">
+              {selectedImage.title}
+            </h3>
+          </div>
+
+          {/* Image container */}
+          <div
+            className="relative w-full h-full flex items-center justify-center"
+            style={{
+              animation: 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.alt}
+              className="max-w-full max-h-full object-contain rounded-sm"
+            />
+          </div>
+
+          {/* ESC hint */}
+          <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 text-[10px] uppercase tracking-[0.3em] font-mono text-cream/40">
+            Press <span className="text-cream/60">ESC</span> to close
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </>
   );
 }

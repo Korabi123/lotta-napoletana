@@ -63,6 +63,41 @@
     background: var(--terracotta);
     color: var(--cream);
   }
+
+  /* Language switch animation */
+  body.lang-switching main,
+  body.lang-switching section,
+  body.lang-switching h1,
+  body.lang-switching h2,
+  body.lang-switching h3,
+  body.lang-switching p,
+  body.lang-switching span:not(.cursor-label),
+  body.lang-switching a:not(.cursor-ring):not(.cursor-dot),
+  body.lang-switching button:not([aria-label*="Switch"]):not([aria-label*="Kalo"]) {
+    animation: langFadeOut 0.2s ease-out forwards, langFadeIn 0.4s 0.2s ease-in forwards;
+  }
+
+  @keyframes langFadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes langFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @utility font-display {

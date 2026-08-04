@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useLang } from "@/lib/lang-context";
 import { t } from "@/lib/i18n";
+import { useEffect, useState } from "react";
 
 export const WOLT_URL = "https://wolt.com/sq/xkx/pristina/restaurant/lottas-pizzabar-napoletana";
 export const GLOVO_URL = "https://glovoapp.com/";
@@ -12,10 +13,31 @@ export const ADDRESS = "26 Meto Bajraktari, Prishtinë 10000";
 
 export function LangSwitcher({ className = "" }: { className?: string }) {
   const { lang, setLang } = useLang();
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleLangSwitch = () => {
+    setIsAnimating(true);
+
+    // Add global animation class
+    document.body.classList.add('lang-switching');
+
+    // Switch language after fade out
+    setTimeout(() => {
+      setLang(lang === "en" ? "sq" : "en");
+    }, 200);
+
+    // Remove animation class after fade in
+    setTimeout(() => {
+      setIsAnimating(false);
+      document.body.classList.remove('lang-switching');
+    }, 600);
+  };
+
   return (
     <button
-      onClick={() => setLang(lang === "en" ? "sq" : "en")}
-      className={`text-[11px] uppercase tracking-[0.25em] font-mono opacity-70 hover:opacity-100 transition select-none ${className}`}
+      onClick={handleLangSwitch}
+      disabled={isAnimating}
+      className={`text-[11px] uppercase tracking-[0.25em] font-mono opacity-70 hover:opacity-100 transition select-none ${className} ${isAnimating ? 'pointer-events-none' : ''}`}
       aria-label={lang === "en" ? "Switch to Albanian" : "Kalo në Anglisht"}
     >
       <span className={lang === "en" ? "opacity-100" : "opacity-40"}>EN</span>
